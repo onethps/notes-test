@@ -1,136 +1,79 @@
-let request: IDBOpenDBRequest;
-let db: IDBDatabase;
-let version = 1;
+import { IDBPDatabase, openDB } from "idb";
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
+class IndexedDb {
+  private database: string;
+  private db: any;
+
+  constructor(database: string) {
+    this.database = database;
+  }
+
+  public async createObjectStore(tableNames: string[]) {
+    try {
+      this.db = await openDB(this.database, 1, {
+        upgrade(db: IDBPDatabase) {
+          for (const tableName of tableNames) {
+            if (db.objectStoreNames.contains(tableName)) {
+              continue;
+            }
+            db.createObjectStore(tableName, {
+              autoIncrement: true,
+              keyPath: "id",
+            });
+          }
+        },
+      });
+    } catch (error) {
+      return false;
+    }
+  }
+
+  public async getValue(tableName: string, id: number) {
+    const tx = this.db.transaction(tableName, "readonly");
+    const store = tx.objectStore(tableName);
+    const result = await store.get(id);
+    console.log("Get Data ", JSON.stringify(result));
+    return result;
+  }
+
+  public async getAllValue(tableName: string) {
+    const tx = this.db.transaction(tableName, "readonly");
+    const store = tx.objectStore(tableName);
+    const result = await store.getAll();
+    console.log("Get All Data", JSON.stringify(result));
+    return result;
+  }
+
+  public async putValue(tableName: string, value: object) {
+    const tx = this.db.transaction(tableName, "readwrite");
+    const store = tx.objectStore(tableName);
+    const result = await store.put(value);
+    console.log("Put Data ", JSON.stringify(result));
+    return result;
+  }
+
+  public async putBulkValue(tableName: string, values: object[]) {
+    const tx = this.db.transaction(tableName, "readwrite");
+    const store = tx.objectStore(tableName);
+    for (const value of values) {
+      const result = await store.put(value);
+      console.log("Put Bulk Data ", JSON.stringify(result));
+    }
+    return this.getAllValue(tableName);
+  }
+
+  public async deleteValue(tableName: string, id: number) {
+    const tx = this.db.transaction(tableName, "readwrite");
+    const store = tx.objectStore(tableName);
+    const result = await store.get(id);
+    if (!result) {
+      console.log("Id not found", id);
+      return result;
+    }
+    await store.delete(id);
+    console.log("Deleted Data", id);
+    return id;
+  }
 }
 
-export enum Stores {
-  Notes = "notes",
-}
-
-export const initDB = (): Promise<boolean | IDBDatabase> => {
-  return new Promise((resolve) => {
-    request = indexedDB.open("myDB");
-
-    // if the data object store doesn't exist, create it
-    request.onupgradeneeded = () => {
-      db = request.result;
-
-      if (!db.objectStoreNames.contains(Stores.Notes)) {
-        console.log("Creating notes store");
-        db.createObjectStore(Stores.Notes, { keyPath: "id" });
-      }
-      // no need to resolve here
-    };
-
-    request.onsuccess = (e) => {
-      db = request.result;
-      // get current version and store it
-      version = db.version;
-      resolve(request.result);
-    };
-
-    request.onerror = (e) => {
-      resolve(false);
-    };
-  });
-};
-
-export const addData = <T>(
-  storeName: string,
-  data: T
-): Promise<T | string | null> => {
-  return new Promise((resolve) => {
-    request = indexedDB.open("myDB", version);
-
-    request.onsuccess = () => {
-      console.log("request.onsuccess - addData", data);
-      db = request.result;
-      const tx = db.transaction(storeName, "readwrite");
-      const store = tx.objectStore(storeName);
-      store.add(data);
-      resolve(data);
-    };
-
-    request.onerror = () => {
-      const error = request.error?.message;
-      if (error) {
-        resolve(error);
-      } else {
-        resolve("Unknown error");
-      }
-    };
-  });
-};
-
-export const deleteData = (
-  storeName: string,
-  key: string
-): Promise<boolean> => {
-  return new Promise((resolve) => {
-    request = indexedDB.open("myDB", version);
-
-    request.onsuccess = () => {
-      console.log("request.onsuccess - deleteData", key);
-      db = request.result;
-      const tx = db.transaction(storeName, "readwrite");
-      const store = tx.objectStore(storeName);
-      const res = store.delete(key);
-      res.onsuccess = () => {
-        resolve(true);
-      };
-      res.onerror = () => {
-        resolve(false);
-      };
-    };
-  });
-};
-
-export const updateData = <T>(
-  storeName: string,
-  key: string,
-  data: T
-): Promise<T | string | null> => {
-  return new Promise((resolve) => {
-    request = indexedDB.open("myDB", version);
-
-    request.onsuccess = () => {
-      console.log("request.onsuccess - updateData", key);
-      db = request.result;
-      const tx = db.transaction(storeName, "readwrite");
-      const store = tx.objectStore(storeName);
-      const res = store.get(key);
-      res.onsuccess = () => {
-        const newData = { ...res.result, ...data };
-        store.put(newData);
-        resolve(newData);
-      };
-      res.onerror = () => {
-        resolve(null);
-      };
-    };
-  });
-};
-
-export const getStoreData = <T>(storeName: Stores): Promise<T[]> => {
-  return new Promise((resolve) => {
-    request = indexedDB.open("myDB");
-
-    request.onsuccess = () => {
-      console.log("request.onsuccess - getAllData");
-      db = request.result;
-      const tx = db.transaction(storeName, "readonly");
-      const store = tx.objectStore(storeName);
-      const res = store.getAll();
-      res.onsuccess = () => {
-        resolve(res.result);
-      };
-    };
-  });
-};
-
-export {};
+export default IndexedDb;
