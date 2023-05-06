@@ -4,27 +4,41 @@ import {
   createContext,
   useState,
   useEffect,
+  Dispatch,
+  SetStateAction,
   PropsWithChildren,
 } from "react";
+import { store } from "../lib/store";
+
+export interface Note {
+  id: string;
+  note: string;
+}
 
 export interface IAppContext {
-  notes: any[];
-  setNewNote?: (newNote: any) => void;
+  notes: Note[];
+  setNotesState: (notes: Note[]) => void;
 }
 
 export const AppContext = createContext<IAppContext>({
   notes: [],
+  setNotesState: (notes: Note[]) => undefined,
 });
 
 export const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [notesState, setNotesState] = useState<any[]>([]);
+  const [notesState, setNotesState] = useState<Note[]>([]);
 
-  const setNewNote = (newNote: any) => {
-    setNotesState(newNote);
-  };
+  useEffect(() => {
+    const initNotesStore = async () => {
+      await store.createObjectStore(["notes"]);
+      const data = await store.getAllValue("notes");
+      setNotesState(data);
+    };
+    initNotesStore();
+  }, []);
 
   return (
-    <AppContext.Provider value={{ notes: notesState, setNewNote }}>
+    <AppContext.Provider value={{ notes: notesState, setNotesState }}>
       {children}
     </AppContext.Provider>
   );

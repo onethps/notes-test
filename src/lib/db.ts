@@ -28,7 +28,7 @@ class IndexedDb {
     }
   }
 
-  public async getValue(tableName: string, id: number) {
+  public async getValue(tableName: string, id: string) {
     const tx = this.db.transaction(tableName, "readonly");
     const store = tx.objectStore(tableName);
     const result = await store.get(id);
@@ -62,7 +62,7 @@ class IndexedDb {
     return this.getAllValue(tableName);
   }
 
-  public async deleteValue(tableName: string, id: number) {
+  public async deleteValue(tableName: string, id: string) {
     const tx = this.db.transaction(tableName, "readwrite");
     const store = tx.objectStore(tableName);
     const result = await store.get(id);
