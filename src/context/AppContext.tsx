@@ -22,24 +22,32 @@ export interface IAppContext {
 
 export const AppContext = createContext<IAppContext>({
   notes: [],
-  setNotesState: (notes: Note[]) => undefined,
+  setNotesState: () => undefined,
 });
 
 export const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const [notesState, setNotesState] = useState<Note[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const initNotesStore = async () => {
-      await store.createObjectStore(["notes"]);
-      const data = await store.getAllValue("notes");
-      setNotesState(data);
+      setIsLoading(true);
+      try {
+        await store.createObjectStore(["notes"]);
+        const data = await store.getAllValue("notes");
+        setNotesState(data);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setIsLoading(false);
+      }
     };
     initNotesStore();
   }, []);
 
   return (
     <AppContext.Provider value={{ notes: notesState, setNotesState }}>
-      {children}
+      {isLoading ? <div>loading</div> : children}
     </AppContext.Provider>
   );
 };

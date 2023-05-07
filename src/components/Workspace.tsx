@@ -1,32 +1,34 @@
-import { FC, useState, ChangeEvent, useEffect, useContext } from "react";
-import { ReactMarkdown } from "react-markdown/lib/react-markdown";
-import remarkGfm from "remark-gfm";
-import IndexedDb from "../lib/db";
+import { FC, useState, ChangeEvent, useEffect, useRef } from "react";
 import { useNotes } from "../hooks/useNotes";
-import { AppContext } from "../context/AppContext";
-import { Routes, Route, useParams } from "react-router-dom";
-const markdown = `Here is some JavaScript code:
-
-~~~js
-console.log('It works!')
-~~~
-`;
+import { useParams } from "react-router-dom";
+import { useDebounce } from "../hooks/useDebounce";
 
 export const Workspace: FC = () => {
   const { id } = useParams();
-  const { getNote } = useNotes();
-  const [value, setValue] = useState<string>("cascsacasccccccccccccc");
+  const { setNote, notes } = useNotes();
 
-  // console.log(notes);
+  const [currentNote, setCurrentNote] = useState("");
+  const debouncedValue = useDebounce<string>(currentNote, 500);
+
+  useEffect(() => {
+    const dbNote = notes.find((note) => note.id === id)?.note;
+    dbNote && setCurrentNote(dbNote);
+  }, [id]);
+
+  useEffect(() => {
+    if (id && currentNote) {
+      setNote({ id, note: debouncedValue });
+    }
+  }, [debouncedValue]);
 
   const onChangeNote = (e: ChangeEvent<HTMLTextAreaElement>) =>
-    setValue(e.target.value);
+    setCurrentNote(e.target.value);
 
   return (
-    <main className="bg-yellow-300 flex-grow min-h-screen">
+    <main className="bg-yellow-300 flex-grow min-h-screen md:ml-[330px] sm:ml-auto">
       <textarea
         className="w-full h-full p-5 first-line:font-bold first-line:text-3xl"
-        value={value}
+        value={currentNote}
         onChange={onChangeNote}
       />
     </main>
