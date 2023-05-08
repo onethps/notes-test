@@ -49,6 +49,7 @@ export const useNotes = () => {
   return {
     notes,
     loading,
+    error,
     setNote,
     getNote,
     deleteNote,

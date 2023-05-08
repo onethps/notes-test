@@ -6,7 +6,7 @@ function App() {
   return (
     <>
       <Header />
-      <div className="flex w-full">
+      <div className="relative flex w-full pt-[65px] bg-gray-50 min-h-screen overflow-hidden">
         <Sidebar />
         <Workspace />
       </div>

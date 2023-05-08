@@ -1,45 +1,36 @@
-import { FC, useContext, useState } from "react";
+import { FC, useEffect, useState, useRef } from "react";
 import { useNotes } from "../hooks/useNotes";
 import { useParams } from "react-router-dom";
 import { ListItem } from "./ListItem";
 import { formatDate } from "../utils/formatDate";
-import { Modal } from "flowbite";
+import { Drawer, Modal } from "flowbite";
+import { CgMenuLeftAlt } from "react-icons/cg";
 import cn from "classnames";
-import { AppContext } from "../context/AppContext";
+import { MobileSidebar } from "./Drawer";
+import { useDrawer } from "../hooks/useDrawer";
 
 export const Sidebar: FC = () => {
   const { notes, setEditMode } = useNotes();
-  const { id: paramId } = useParams();
-  const [showSidebar, setShowSidebar] = useState();
+  const { id: noteId } = useParams();
+  const { drawer, refDrawer } = useDrawer();
 
   return (
     <>
       <button
-        data-drawer-target="default-sidebar"
-        data-drawer-toggle="default-sidebar"
-        aria-controls="default-sidebar"
+        onClick={() => drawer.current?.show()}
+        data-drawer-target="drawer-example"
+        data-drawer-show="drawer-example"
+        aria-controls="drawer-example"
         type="button"
-        className="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        className="inline-flex items-start p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg xl:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
       >
         <span className="sr-only">Open sidebar</span>
-        <svg
-          className="w-6 h-6"
-          aria-hidden="true"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            clipRule="evenodd"
-            fillRule="evenodd"
-            d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
-          ></path>
-        </svg>
+        <CgMenuLeftAlt />
       </button>
       <aside
         id="default-sidebar"
         className={cn(
-          "fixed top-[51px] left-0 z-40 w-84 h-screen transition-transform -translate-x-full sm:translate-x-0"
+          "fixed left-0 z-20 w-84 h-screen transition-transform -translate-x-full xl:translate-x-0"
         )}
         aria-label="Sidebar"
       >
@@ -51,13 +42,27 @@ export const Sidebar: FC = () => {
                 key={item.id}
                 id={item.id}
                 note={item.note}
-                activeLink={paramId === item.id}
+                activeLink={noteId === item.id}
                 date={formatDate(item.id)}
               />
             ))}
           </ul>
         </div>
       </aside>
+      <MobileSidebar ref={refDrawer}>
+        <ul className="flex flex-col gap-1">
+          {notes.map((item) => (
+            <ListItem
+              onClick={() => setEditMode(false)}
+              key={item.id}
+              id={item.id}
+              note={item.note}
+              activeLink={noteId === item.id}
+              date={formatDate(item.id)}
+            />
+          ))}
+        </ul>
+      </MobileSidebar>
     </>
   );
 };

@@ -9,6 +9,7 @@ import {
   PropsWithChildren,
 } from "react";
 import { store } from "../lib/store";
+import { Spinner } from "../components/Spinner";
 
 export interface Note {
   id: string;
@@ -54,7 +55,7 @@ export const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
     <AppContext.Provider
       value={{ notes: notesState, setNotesState, editMode, setEditMode }}
     >
-      {loading ? <div>loading...</div> : children}
+      {loading ? <Spinner /> : children}
     </AppContext.Provider>
   );
 };

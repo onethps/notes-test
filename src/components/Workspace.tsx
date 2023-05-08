@@ -1,26 +1,23 @@
-import {
-  FC,
-  useState,
-  ChangeEvent,
-  useEffect,
-  useRef,
-  useContext,
-} from "react";
+import { FC, useState, ChangeEvent, useEffect, useRef } from "react";
 import { useNotes } from "../hooks/useNotes";
 import { useParams } from "react-router-dom";
-import { useDebounce } from "../hooks/useDebounce";
-import { AppContext } from "../context/AppContext";
 import ReactMarkdown from "react-markdown";
+import { useOnClickOutside, useDebounce } from "usehooks-ts";
 
 export const Workspace: FC = () => {
   const { id } = useParams();
-  const { notes, editMode, setNote } = useNotes();
+  const { notes, editMode, setNote, setEditMode } = useNotes();
   const pickedNote = notes.find((note) => note.id === id)?.note;
   const [value, setValue] = useState(pickedNote || "");
   const debouncedValue = useDebounce<string>(value, 500);
+  const editNoteAreaRef = useRef(null);
 
   useEffect(() => {
-    pickedNote && setValue(pickedNote);
+    if (!pickedNote) {
+      setValue("");
+      return;
+    }
+    setValue(pickedNote);
   }, [id]);
 
   useEffect(() => {
@@ -29,20 +26,43 @@ export const Workspace: FC = () => {
     }
   }, [debouncedValue]);
 
+  const onSetEditMode = () => setEditMode(true);
+  const onDisableEditMode = () => setEditMode(false);
+
+  useOnClickOutside(editNoteAreaRef, onDisableEditMode);
+
   const onChangeNote = (e: ChangeEvent<HTMLTextAreaElement>) =>
     setValue(e.target.value);
 
+  if (!id) {
+    return (
+      <div className="md:ml-[330px] bg-gray-50 w-full min-h-screen flex items-center justify-center text-gray-400">
+        Select or create a new note...
+      </div>
+    );
+  }
+
   return (
-    <main className="bg-gray-50 flex-grow min-h-screen md:ml-[330px] sm:ml-auto">
+    <main className=" flex-grow xl:ml-[330px] sm:ml-auto">
       {editMode ? (
         <textarea
-          className="w-full h-full p-5 first-line:font-bold first-line:text-3xl"
+          ref={editNoteAreaRef}
+          className="w-full h-full p-5"
           value={value}
           onChange={onChangeNote}
+          placeholder="New note..."
         />
       ) : (
-        <div className="prose  max-w-5xl p-5">
-          <ReactMarkdown>{value}</ReactMarkdown>
+        <div
+          className="prose  max-w-5xl p-5"
+          onClick={onSetEditMode}
+          role="presentation"
+        >
+          {value ? (
+            <ReactMarkdown>{value}</ReactMarkdown>
+          ) : (
+            <p className="text-gray-400">New note...</p>
+          )}
         </div>
       )}
     </main>
