@@ -18,36 +18,43 @@ export interface Note {
 export interface IAppContext {
   notes: Note[];
   setNotesState: (notes: Note[]) => void;
+  editMode: boolean;
+  setEditMode: (v: boolean) => void;
 }
 
 export const AppContext = createContext<IAppContext>({
   notes: [],
   setNotesState: () => undefined,
+  editMode: false,
+  setEditMode: () => undefined,
 });
 
 export const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const [notesState, setNotesState] = useState<Note[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+
+  const initNotesStore = async () => {
+    try {
+      await store.createObjectStore(["notes"]);
+      const data = await store.getAllValue("notes");
+      setNotesState(data);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const initNotesStore = async () => {
-      setIsLoading(true);
-      try {
-        await store.createObjectStore(["notes"]);
-        const data = await store.getAllValue("notes");
-        setNotesState(data);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     initNotesStore();
   }, []);
 
   return (
-    <AppContext.Provider value={{ notes: notesState, setNotesState }}>
-      {isLoading ? <div>loading</div> : children}
+    <AppContext.Provider
+      value={{ notes: notesState, setNotesState, editMode, setEditMode }}
+    >
+      {loading ? <div>loading...</div> : children}
     </AppContext.Provider>
   );
 };

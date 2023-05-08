@@ -1,15 +1,15 @@
-import { FC, useState } from "react";
+import { FC, useContext, useState } from "react";
 import { useNotes } from "../hooks/useNotes";
 import { useParams } from "react-router-dom";
 import { ListItem } from "./ListItem";
 import { formatDate } from "../utils/formatDate";
 import { Modal } from "flowbite";
 import cn from "classnames";
+import { AppContext } from "../context/AppContext";
 
 export const Sidebar: FC = () => {
-  const { notes } = useNotes();
+  const { notes, setEditMode } = useNotes();
   const { id: paramId } = useParams();
-
   const [showSidebar, setShowSidebar] = useState();
 
   return (
@@ -30,8 +30,8 @@ export const Sidebar: FC = () => {
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            clip-rule="evenodd"
-            fill-rule="evenodd"
+            clipRule="evenodd"
+            fillRule="evenodd"
             d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
           ></path>
         </svg>
@@ -47,6 +47,7 @@ export const Sidebar: FC = () => {
           <ul className="flex flex-col gap-1">
             {notes.map((item) => (
               <ListItem
+                onClick={() => setEditMode(false)}
                 key={item.id}
                 id={item.id}
                 note={item.note}

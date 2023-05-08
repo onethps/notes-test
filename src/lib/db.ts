@@ -40,7 +40,7 @@ class IndexedDb {
     const tx = this.db.transaction(tableName, "readonly");
     const store = tx.objectStore(tableName);
     const result = await store.getAll();
-    console.log("Get All Data", JSON.stringify(result));
+    // console.log("Get All Data", JSON.stringify(result));
     return result;
   }
 
@@ -48,7 +48,7 @@ class IndexedDb {
     const tx = this.db.transaction(tableName, "readwrite");
     const store = tx.objectStore(tableName);
     const result = await store.put(value);
-    console.log("Put Data ", JSON.stringify(result));
+    // console.log("Put Data ", JSON.stringify(result));
     return result;
   }
 
@@ -57,7 +57,7 @@ class IndexedDb {
     const store = tx.objectStore(tableName);
     for (const value of values) {
       const result = await store.put(value);
-      console.log("Put Bulk Data ", JSON.stringify(result));
+      // console.log("Put Bulk Data ", JSON.stringify(result));
     }
     return this.getAllValue(tableName);
   }
@@ -67,11 +67,11 @@ class IndexedDb {
     const store = tx.objectStore(tableName);
     const result = await store.get(id);
     if (!result) {
-      console.log("Id not found", id);
+      // console.log("Id not found", id);
       return result;
     }
     await store.delete(id);
-    console.log("Deleted Data", id);
+    // console.log("Deleted Data", id);
     return id;
   }
 }

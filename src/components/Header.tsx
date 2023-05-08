@@ -6,25 +6,24 @@ import { useNotes } from "../hooks/useNotes";
 import { useParams } from "react-router-dom";
 
 import { DeleteModal } from "./DeleteModal";
+import { useModal } from "../hooks/useModal";
 
 export const Header: FC = () => {
-  const { setNote, deleteNote } = useNotes();
+  const { setEditMode, setNote, deleteNote } = useNotes();
+  const { handleCloseModal, handleOpenModal, showModal } = useModal();
   const { id } = useParams();
-
-  const [showModal, setShowModal] = useState(false);
 
   const onAddNewEmptyNote = () => {
     setNote({ note: "", id: Date.now().toString() });
   };
-
-  const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
 
   const onDeleteNote = () => {
     if (!id) return;
     deleteNote(id);
     handleCloseModal();
   };
+
+  const onSetEditMode = () => setEditMode(true);
 
   return (
     <>
@@ -36,7 +35,7 @@ export const Header: FC = () => {
           <button onClick={handleOpenModal}>
             <BiTrash />
           </button>
-          <button>
+          <button onClick={onSetEditMode}>
             <SlNote />
           </button>
         </div>

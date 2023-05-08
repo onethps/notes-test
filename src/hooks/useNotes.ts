@@ -4,7 +4,8 @@ import { store } from "../lib/store";
 import { AppContext, Note } from "../context/AppContext";
 
 export const useNotes = () => {
-  const { notes, setNotesState } = useContext(AppContext);
+  const { notes, setNotesState, editMode, setEditMode } =
+    useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -47,8 +48,11 @@ export const useNotes = () => {
 
   return {
     notes,
+    loading,
     setNote,
     getNote,
     deleteNote,
+    editMode,
+    setEditMode,
   };
 };

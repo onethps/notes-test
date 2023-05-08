@@ -1,11 +1,16 @@
 import { Workspace } from "./components/Workspace";
-import { Layout } from "./components/Layout";
+import { Header } from "./components/Header";
+import { Sidebar } from "./components/Sidebar";
 
 function App() {
   return (
-    <Layout>
-      <Workspace />
-    </Layout>
+    <>
+      <Header />
+      <div className="flex w-full">
+        <Sidebar />
+        <Workspace />
+      </div>
+    </>
   );
 }
 
