@@ -5,7 +5,7 @@ import { ListItem } from "./ListItem";
 import { formatDate } from "../utils/formatDate";
 import { CgMenuLeftAlt } from "react-icons/cg";
 import cn from "classnames";
-import { MobileSidebar } from "./Drawer";
+import { MobileSidebar } from "./MobileSidebar";
 import { useDrawer } from "../hooks/useDrawer";
 
 export const Sidebar: FC = () => {
