@@ -2,14 +2,16 @@ import { useEffect, useState, forwardRef } from "react";
 import { Note } from "../context/AppContext";
 import ReactMarkdown from "react-markdown";
 import { useDebounce } from "usehooks-ts";
+import { Link } from "react-router-dom";
 
 interface SearchBoxProps {
   searchValue: string;
   notes: Note[];
+  handleClose: () => void;
 }
 
 export const SearchBox = forwardRef<HTMLDivElement, SearchBoxProps>(
-  ({ searchValue, notes }, ref) => {
+  ({ searchValue, notes, handleClose }, ref) => {
     const [result, setResult] = useState<Note[]>([]);
     const debouncedValue = useDebounce<string>(searchValue, 500);
     const searchNotes = notes.filter(({ note }) =>
@@ -33,14 +35,15 @@ export const SearchBox = forwardRef<HTMLDivElement, SearchBoxProps>(
           {result.length > 0 && searchValue.length > 2 ? (
             result.map((note) => (
               <li key={note.id}>
-                <a
-                  href="#"
+                <Link
+                  onClick={handleClose}
+                  to={"/" + note.id}
                   className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                 >
                   <div className="line-clamp-1 text-sm">
                     <ReactMarkdown>{note.note}</ReactMarkdown>
                   </div>
-                </a>
+                </Link>
               </li>
             ))
           ) : (

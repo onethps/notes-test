@@ -21,7 +21,7 @@ export const Header: FC = () => {
 
   const { setEditMode, setNote, deleteNote, notes } = useNotes();
   const { handleCloseModal, handleOpenModal, showModal } = useModal();
-  useDropdown(searchBoxRef, searchInputRef);
+  const { dropdown } = useDropdown(searchBoxRef, searchInputRef);
 
   const onAddNewEmptyNote = () => {
     setNote({ note: "", id: Date.now().toString() });
@@ -35,6 +35,10 @@ export const Header: FC = () => {
   };
 
   const onSetEditMode = () => setEditMode(true);
+  const onCloseSearchBox = () => {
+    dropdown.current?.toggle();
+    setSearchValue("");
+  };
 
   return (
     <>
@@ -56,7 +60,12 @@ export const Header: FC = () => {
           searchValue={searchValue}
           onChangeSearchValue={setSearchValue}
         />
-        <SearchBox ref={searchBoxRef} searchValue={searchValue} notes={notes} />
+        <SearchBox
+          ref={searchBoxRef}
+          searchValue={searchValue}
+          notes={notes}
+          handleClose={onCloseSearchBox}
+        />
       </header>
       <DeleteModal
         isOpen={showModal}

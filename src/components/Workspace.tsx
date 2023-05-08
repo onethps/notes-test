@@ -3,6 +3,7 @@ import { useNotes } from "../hooks/useNotes";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { useOnClickOutside, useDebounce } from "usehooks-ts";
+import remarkGfm from "remark-gfm";
 
 export const Workspace: FC = () => {
   const { id } = useParams();
@@ -54,12 +55,12 @@ export const Workspace: FC = () => {
         />
       ) : (
         <div
-          className="prose  max-w-5xl p-5"
+          className="prose max-w-6xl p-5 text-ellipsis"
           onClick={onSetEditMode}
           role="presentation"
         >
           {value ? (
-            <ReactMarkdown>{value}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
           ) : (
             <p className="text-gray-400">New note...</p>
           )}

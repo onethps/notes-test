@@ -1,32 +1,36 @@
-import { FC, useEffect, useState, useRef } from "react";
+import { FC } from "react";
 import { useNotes } from "../hooks/useNotes";
 import { useParams } from "react-router-dom";
 import { ListItem } from "./ListItem";
 import { formatDate } from "../utils/formatDate";
-import { Drawer, Modal } from "flowbite";
 import { CgMenuLeftAlt } from "react-icons/cg";
 import cn from "classnames";
 import { MobileSidebar } from "./Drawer";
 import { useDrawer } from "../hooks/useDrawer";
 
 export const Sidebar: FC = () => {
-  const { notes, setEditMode } = useNotes();
+  const { notes } = useNotes();
   const { id: noteId } = useParams();
   const { drawer, refDrawer } = useDrawer();
 
+  const onNoteListItemClick = () => drawer.current?.toggle();
+
   return (
     <>
-      <button
-        onClick={() => drawer.current?.show()}
-        data-drawer-target="drawer-example"
-        data-drawer-show="drawer-example"
-        aria-controls="drawer-example"
-        type="button"
-        className="inline-flex items-start p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg xl:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-      >
-        <span className="sr-only">Open sidebar</span>
-        <CgMenuLeftAlt />
-      </button>
+      {/* mobile burger */}
+      <div>
+        <button
+          onClick={() => drawer.current?.show()}
+          data-drawer-target="drawer-example"
+          data-drawer-show="drawer-example"
+          aria-controls="drawer-example"
+          type="button"
+          className="inline-flex items-start p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg xl:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        >
+          <span className="sr-only">Open sidebar</span>
+          <CgMenuLeftAlt />
+        </button>
+      </div>
       <aside
         id="default-sidebar"
         className={cn(
@@ -38,7 +42,6 @@ export const Sidebar: FC = () => {
           <ul className="flex flex-col gap-1">
             {notes.map((item) => (
               <ListItem
-                onClick={() => setEditMode(false)}
                 key={item.id}
                 id={item.id}
                 note={item.note}
@@ -53,7 +56,7 @@ export const Sidebar: FC = () => {
         <ul className="flex flex-col gap-1">
           {notes.map((item) => (
             <ListItem
-              onClick={() => setEditMode(false)}
+              onClick={onNoteListItemClick}
               key={item.id}
               id={item.id}
               note={item.note}
