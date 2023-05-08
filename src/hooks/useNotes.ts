@@ -16,7 +16,7 @@ export const useNotes = () => {
       const data = await store.getAllValue("notes");
       setNotesState(data);
     } catch (err) {
-      setError(err as any);
+      setError(err as string);
     } finally {
       setLoading(false);
     }
@@ -27,7 +27,7 @@ export const useNotes = () => {
     try {
       await store.getValue("notes", id);
     } catch (err) {
-      setError(err as any);
+      setError(err as string);
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ export const useNotes = () => {
       const data = await store.getAllValue("notes");
       setNotesState(data);
     } catch (err) {
-      setError(err as any);
+      setError(err as string);
     } finally {
       setLoading(false);
     }

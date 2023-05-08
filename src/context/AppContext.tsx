@@ -1,11 +1,8 @@
 import {
   FC,
-  ReactNode,
   createContext,
   useState,
   useEffect,
-  Dispatch,
-  SetStateAction,
   PropsWithChildren,
 } from "react";
 import { store } from "../lib/store";
@@ -41,7 +38,7 @@ export const AppContextProvider: FC<PropsWithChildren> = ({ children }) => {
       const data = await store.getAllValue("notes");
       setNotesState(data);
     } catch (err) {
-      console.log(err);
+      console.info(err);
     } finally {
       setLoading(false);
     }
